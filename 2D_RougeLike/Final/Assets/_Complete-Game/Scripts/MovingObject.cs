@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using FMOD.Studio;
+using FMODUnity;
 
 namespace Completed
 {
@@ -11,22 +13,32 @@ namespace Completed
 		
 		
 		private BoxCollider2D boxCollider; 		//The BoxCollider2D component attached to this object.
-		private Rigidbody2D rb2D;				//The Rigidbody2D component attached to this object.
+		protected Rigidbody2D rb2D;				//The Rigidbody2D component attached to this object.
 		private float inverseMoveTime;			//Used to make movement more efficient.
-		private bool isMoving;					//Is the object currently moving.
-		
-		
-		//Protected, virtual functions can be overridden by inheriting classes.
-		protected virtual void Start ()
+		private bool isMoving;                  //Is the object currently moving.
+
+        [FMODUnity.EventRef]
+        public string PlayerMove;
+        private EventInstance playerMove;
+
+       
+
+
+        //Protected, virtual functions can be overridden by inheriting classes.
+        protected virtual void Start ()
 		{
 			//Get a component reference to this object's BoxCollider2D
 			boxCollider = GetComponent <BoxCollider2D> ();
 			
 			//Get a component reference to this object's Rigidbody2D
 			rb2D = GetComponent <Rigidbody2D> ();
-			
-			//By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
-			inverseMoveTime = 1f / moveTime;
+
+            playerMove = FMODUnity.RuntimeManager.CreateInstance("event:/Player/PlayerMove");
+
+            isMoving = false;
+
+            //By storing the reciprocal of the move time we can use it by multiplying instead of dividing, this is more efficient.
+            inverseMoveTime = 1.0f / moveTime;
 		}
 		
 		
@@ -34,6 +46,11 @@ namespace Completed
 		//Move takes parameters for x direction, y direction and a RaycastHit2D to check collision.
 		protected bool Move (int xDir, int yDir, out RaycastHit2D hit)
 		{
+            if(boxCollider == null)
+            {
+                boxCollider = GetComponent<BoxCollider2D>();
+            }
+
 			//Store start position to move from, based on objects current transform position.
 			Vector2 start = transform.position;
 			
@@ -54,22 +71,28 @@ namespace Completed
 			{
 				//Start SmoothMovement co-routine passing in the Vector2 end as destination
 				StartCoroutine (SmoothMovement (end));
+                playerMove.start();
 
-				//Return true to say that Move was successful
-				return true;
+                //Return true to say that Move was successful
+                return true;
 			}
-			
-			//If something was hit, return false, Move was unsuccesful.
-			return false;
+
+
+            //If something was hit, return false, Move was unsuccesful.
+            return false;
 		}
 		
 		
 		//Co-routine for moving units from one space to next, takes a parameter end to specify where to move to.
 		protected IEnumerator SmoothMovement (Vector3 end)
 		{
+            if(rb2D == null)
+            {
+                rb2D = GetComponent<Rigidbody2D>();
+            }
 			//The object is now moving.
 			isMoving = true;
-			
+            inverseMoveTime = 10.0f;
 			//Calculate the remaining distance to move based on the square magnitude of the difference between current position and end parameter. 
 			//Square magnitude is used instead of magnitude because it's computationally cheaper.
 			float sqrRemainingDistance = (transform.position - end).sqrMagnitude;
@@ -108,14 +131,17 @@ namespace Completed
 			
 			//Set canMove to true if Move was successful, false if failed.
 			bool canMove = Move (xDir, yDir, out hit);
-			
-			//Check if nothing was hit by linecast
-			if(hit.transform == null)
-				//If nothing was hit, return and don't execute further code.
-				return;
-			
-			//Get a component reference to the component of type T attached to the object that was hit
-			T hitComponent = hit.transform.GetComponent <T> ();
+
+            //Check if nothing was hit by linecast
+            if (hit.transform == null)
+            {
+                //If nothing was hit, return and don't execute further code.
+                return;
+            }
+
+
+            //Get a component reference to the component of type T attached to the object that was hit
+            T hitComponent = hit.transform.GetComponent <T> ();
 			
 			//If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
 			if(!canMove && hitComponent != null)

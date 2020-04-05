@@ -66,13 +66,14 @@ namespace Completed
         //This is called each time a scene is loaded.
         static private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
-            instance.level++;
             instance.InitGame();
+            instance.level++;
+
         }
 
-		
-		//Initializes the game for each level.
-		void InitGame()
+
+        //Initializes the game for each level.
+        void InitGame()
 		{
 			//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 			doingSetup = true;
@@ -130,10 +131,16 @@ namespace Completed
 			//Add Enemy to List enemies.
 			enemies.Add(script);
 		}
-		
-		
-		//GameOver is called when the player reaches 0 food points
-		public void GameOver()
+
+        public void RemoveEnemyFromList(Enemy script)
+        {
+            //Remove Enemy from List enemies.
+            enemies.Remove(script);
+        }
+
+
+        //GameOver is called when the player reaches 0 food points
+        public void GameOver()
 		{
 			//Set levelText to display number of levels passed and game over message
 			levelText.text = "After " + level + " days, you starved.";
