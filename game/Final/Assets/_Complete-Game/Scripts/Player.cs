@@ -23,8 +23,9 @@ namespace Completed
 		public AudioClip drinkSound2;				//2 of 2 Audio clips to play when player collects a soda object.
 		public AudioClip gameOverSound;				//Audio clip to play when player dies.
         private bool check;
-		
-		private Animator animator;					//Used to store a reference to the Player's animator component.
+        private bool foodCheck;
+
+        private Animator animator;					//Used to store a reference to the Player's animator component.
 		private int food;                           //Used to store player food points total during level.
 
         [FMODUnity.EventRef]
@@ -52,6 +53,18 @@ namespace Completed
         public string PlayerDeath;
         private EventInstance playerDeath;
 
+        [FMODUnity.EventRef]
+        public string PlayerHitEnemy;
+        private EventInstance playerHitEnemy;
+
+        [FMODUnity.EventRef]
+        public string FoodCrunch;
+        private EventInstance foodCrunch;
+
+        [FMODUnity.EventRef]
+        public string SodaDrink;
+        private EventInstance sodaDrink;
+
         //[FMODUnity.EventRef]
         //public string PlayerMove;
 
@@ -75,6 +88,7 @@ namespace Completed
 			foodText.text = "Food: " + food;
 
             check = true;
+            foodCheck = true;
 
             playerBreak = FMODUnity.RuntimeManager.CreateInstance(PlayerBreak);
             //playerMove = FMODUnity.RuntimeManager.CreateInstance(PlayerMove);
@@ -83,10 +97,15 @@ namespace Completed
             pickUp = FMODUnity.RuntimeManager.CreateInstance(PickUp);
 
             healthLow = FMODUnity.RuntimeManager.CreateInstance(HealthLow);
-            healthLow.start();
 
             hitWall = FMODUnity.RuntimeManager.CreateInstance(HitWall);
             playerDeath = FMODUnity.RuntimeManager.CreateInstance(PlayerDeath);
+
+            playerHitEnemy = FMODUnity.RuntimeManager.CreateInstance(PlayerHitEnemy);
+
+            foodCrunch = FMODUnity.RuntimeManager.CreateInstance(FoodCrunch);
+
+            sodaDrink = FMODUnity.RuntimeManager.CreateInstance(SodaDrink);
 
             //Call the Start function of the MovingObject base class.
             base.Start ();
@@ -98,10 +117,12 @@ namespace Completed
 		{
 			//When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
 			GameManager.instance.playerFoodPoints = food;
-		}
-		
-		
-		private void Update ()
+            //healthLow.setPaused(false);
+
+        }
+
+
+        private void Update ()
 		{
 			//If it's not the player's turn, exit the function.
 			if(!GameManager.instance.playersTurn) return;
@@ -199,16 +220,17 @@ namespace Completed
 		protected override void AttemptMove <T> (int xDir, int yDir)
 		{
             //Every time player moves, subtract from food points total.
-            food--;
-			
-			//Update food text display to reflect current score.
-			foodText.text = "Food: " + food;
-			
-			//Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
-			base.AttemptMove <T> (xDir, yDir);
-			
-			//Hit allows us to reference the result of the Linecast done in Move.
-			//RaycastHit2D hit;
+            //food--;
+
+            LoseFood();
+
+            //Update food text display to reflect current score.
+
+            //Call the AttemptMove method of the base class, passing in the component T (in this case Wall) and x and y direction to move.
+            base.AttemptMove <T> (xDir, yDir);
+
+            //Hit allows us to reference the result of the Linecast done in Move.
+            //RaycastHit2D hit;
 
             //If Move returns true, meaning Player was able to move into an empty space.
             //if (!Move (xDir, yDir, out hit)) 
@@ -218,7 +240,7 @@ namespace Completed
             //             //playerMove.start();
             //         }
 
-
+            
             //Since the player has moved and lost food points, check if the game has ended.
             CheckIfGameOver();
 			
@@ -230,7 +252,7 @@ namespace Completed
 		
 		//OnCantMove overrides the abstract function OnCantMove in MovingObject.
 		//It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-		protected override void OnCantMove <T> (T component)
+		protected override void OnCantMove <T> (T component, bool cantMove = false)
 		{
             if (component is Wall)
             {
@@ -247,7 +269,7 @@ namespace Completed
             {
                 Enemy hitEnemy = component as Enemy;
                 hitEnemy.DamageEnemy(1);
-
+                playerHitEnemy.start();
             }
 
 
@@ -265,9 +287,12 @@ namespace Completed
 			{
                 if (check)
                 {
+                    //healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                    healthLow.setPaused(true);
+                    //foodCheck = true;
                     //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
                     Invoke("Restart", restartLevelDelay);
-
+                   
                     check = false;
 
                 }
@@ -281,30 +306,45 @@ namespace Completed
 			{
 				//Add pointsPerFood to the players current food total.
 				food += pointsPerFood;
-				
-				//Update foodText to represent current total and notify player that they gained points
-				foodText.text = "+" + pointsPerFood + " Food: " + food;
+
+                if (food > 40)
+                {
+                    healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                    foodCheck = true;
+
+                }
+                //Update foodText to represent current total and notify player that they gained points
+                foodText.text = "+" + pointsPerFood + " Food: " + food;
 
                 //Call the RandomizeSfx function of SoundManager and pass in two eating sounds to choose between to play the eating sound effect.
                 //SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
-                pickUp.start();
-
+                //pickUp.start();
+                foodCrunch.start();
                 //Disable the food object the player collided with.
                 other.gameObject.SetActive (false);
-			}
+                
+            }
 			
 			//Check if the tag of the trigger collided with is Soda.
 			else if(other.tag == "Soda")
 			{
 				//Add pointsPerSoda to players food points total
 				food += pointsPerSoda;
-				
-				//Update foodText to represent current total and notify player that they gained points
-				foodText.text = "+" + pointsPerSoda + " Food: " + food;
-				
-				//Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
-				//SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
-                pickUp.start();
+
+                if (food > 40)
+                {
+                    healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                    foodCheck = true;
+
+                }
+                //Update foodText to represent current total and notify player that they gained points
+                foodText.text = "+" + pointsPerSoda + " Food: " + food;
+
+                //Call the RandomizeSfx function of SoundManager and pass in two drinking sounds to choose between to play the drinking sound effect.
+                //SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
+                //pickUp.start();
+                sodaDrink.start();
+
                 //Disable the soda object the player collided with.
                 other.gameObject.SetActive (false);
 			}
@@ -314,30 +354,70 @@ namespace Completed
 		//Restart reloads the scene when called.
 		private void Restart ()
 		{
-			//Load the last scene loaded, in this case Main, the only scene in the game. And we load it in "Single" mode so it replace the existing one
+           
+
+            if (food <= 40 && foodCheck)
+            {
+                healthLow.start();
+                foodCheck = false;
+            }
+
+            //Load the last scene loaded, in this case Main, the only scene in the game. And we load it in "Single" mode so it replace the existing one
             //and not load all the scene object in the current scene.
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
-		}
+            
+        }
 		
 		
 		//LoseFood is called when an enemy attacks the player.
 		//It takes a parameter loss which specifies how many points to lose.
-		public void LoseFood (int loss)
+		public void LoseFood (int loss = 1)
 		{
 			//Set the trigger for the player animator to transition to the playerHit animation.
-			animator.SetTrigger ("playerHit");
 			
 			//Subtract lost food points from the players total.
 			food -= loss;
 
-            // Plays Player Damaged sound
-            playerDamaged.start();
+            //if(food <= 40 && foodCheck)
+            //{
+            //    healthLow.start();
+            //    foodCheck = false;
+            //}
+            //else
+            //{
+            //    healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            //    foodCheck = true;
+            //}
 
-            //Update the food display with the new total.
-            foodText.text = "-"+ loss + " Food: " + food;
-			
-			//Check to see if game has ended.
-			CheckIfGameOver ();
+            if (food <= 40 && foodCheck)
+            {
+                healthLow.start();
+                foodCheck = false;
+            }
+            
+
+            if (loss > 1)
+            {
+                animator.SetTrigger("playerHit");
+
+                // Plays Player Damaged sound
+                playerDamaged.start();
+
+                //Update the food display with the new total.
+                foodText.text = "-" + loss + " Food: " + food;
+
+
+            }
+
+            else
+            {
+                foodText.text = "Food: " + food;
+
+            }
+
+
+            //Check to see if game has ended.
+            CheckIfGameOver ();
 		}
 		
 		

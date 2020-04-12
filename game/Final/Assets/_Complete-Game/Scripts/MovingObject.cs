@@ -21,7 +21,7 @@ namespace Completed
         public string PlayerMove;
         private EventInstance playerMove;
 
-       
+        
 
 
         //Protected, virtual functions can be overridden by inheriting classes.
@@ -71,6 +71,7 @@ namespace Completed
 			{
 				//Start SmoothMovement co-routine passing in the Vector2 end as destination
 				StartCoroutine (SmoothMovement (end));
+
                 playerMove.start();
 
                 //Return true to say that Move was successful
@@ -128,9 +129,10 @@ namespace Completed
 		{
 			//Hit will store whatever our linecast hits when Move is called.
 			RaycastHit2D hit;
-			
-			//Set canMove to true if Move was successful, false if failed.
-			bool canMove = Move (xDir, yDir, out hit);
+
+            //Set canMove to true if Move was successful, false if failed.
+            bool canMove = Move(xDir, yDir, out hit);
+            
 
             //Check if nothing was hit by linecast
             if (hit.transform == null)
@@ -147,13 +149,13 @@ namespace Completed
 			if(!canMove && hitComponent != null)
 				
 				//Call the OnCantMove function and pass it hitComponent as a parameter.
-				OnCantMove (hitComponent);
+				OnCantMove (hitComponent, canMove);
 		}
 		
 		
 		//The abstract modifier indicates that the thing being modified has a missing or incomplete implementation.
 		//OnCantMove will be overriden by functions in the inheriting classes.
-		protected abstract void OnCantMove <T> (T component)
+		protected abstract void OnCantMove <T> (T component, bool cantMove = false)
 			where T : Component;
 	}
 }

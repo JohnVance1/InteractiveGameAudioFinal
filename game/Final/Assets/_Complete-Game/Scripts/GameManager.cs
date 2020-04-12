@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using FMOD.Studio;
+using FMODUnity;
 
 namespace Completed
 {
@@ -22,12 +24,19 @@ namespace Completed
 		private int level = 1;									//Current level number, expressed in game as "Day 1".
 		private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
 		private bool enemiesMoving;								//Boolean to check if enemies are moving.
-		private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
-		
-		
-		
-		//Awake is always called before any Start functions
-		void Awake()
+		private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+
+        [FMODUnity.EventRef]
+        public string LevelSwitch;
+        private EventInstance levelSwitch;
+
+        [FMODUnity.EventRef]
+        public string AmbiantMusic;
+        private EventInstance ambiantMusic;
+
+
+        //Awake is always called before any Start functions
+        void Awake()
 		{
             //Check if instance already exists
             if (instance == null)
@@ -46,9 +55,10 @@ namespace Completed
 			
 			//Assign enemies to a new List of Enemy objects.
 			enemies = new List<Enemy>();
-			
-			//Get a component reference to the attached BoardManager script
-			boardScript = GetComponent<BoardManager>();
+
+
+            //Get a component reference to the attached BoardManager script
+            boardScript = GetComponent<BoardManager>();
 			
 			//Call the InitGame function to initialize the first level 
 			InitGame();
@@ -75,17 +85,20 @@ namespace Completed
         //Initializes the game for each level.
         void InitGame()
 		{
-			//While doingSetup is true the player can't move, prevent player from moving while title card is up.
-			doingSetup = true;
+            levelSwitch = FMODUnity.RuntimeManager.CreateInstance("event:/Misc/LevelSwitch");
+            ambiantMusic = FMODUnity.RuntimeManager.CreateInstance("event:/Music/Ambiant");
+            //While doingSetup is true the player can't move, prevent player from moving while title card is up.
+            doingSetup = true;
 			
 			//Get a reference to our image LevelImage by finding it by name.
 			levelImage = GameObject.Find("LevelImage");
 			
 			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
-			
-			//Set the text of levelText to the string "Day" and append the current level number.
-			levelText.text = "Day " + level;
+
+            levelSwitch.start();
+            //Set the text of levelText to the string "Day" and append the current level number.
+            levelText.text = "Day " + level;
 			
 			//Set levelImage to active blocking player's view of the game board during setup.
 			levelImage.SetActive(true);
@@ -98,8 +111,10 @@ namespace Completed
 			
 			//Call the SetupScene function of the BoardManager script, pass it current level number.
 			boardScript.SetupScene(level);
-			
-		}
+            //levelSwitch.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+
+        }
 		
 		
 		//Hides black image used between levels
@@ -110,7 +125,9 @@ namespace Completed
 			
 			//Set doingSetup to false allowing player to move again.
 			doingSetup = false;
-		}
+            levelSwitch.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            ambiantMusic.start();
+        }
 		
 		//Update is called every frame.
 		void Update()
@@ -142,8 +159,9 @@ namespace Completed
         //GameOver is called when the player reaches 0 food points
         public void GameOver()
 		{
-			//Set levelText to display number of levels passed and game over message
-			levelText.text = "After " + level + " days, you starved.";
+            ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            //Set levelText to display number of levels passed and game over message
+            levelText.text = "After " + level + " days, you starved.";
 			
 			//Enable black background image gameObject.
 			levelImage.SetActive(true);
@@ -173,9 +191,8 @@ namespace Completed
 			{
 				//Call the MoveEnemy function of Enemy at index i in the enemies List.
 				enemies[i].MoveEnemy ();
-				
-				//Wait for Enemy's moveTime before moving next Enemy, 
-				yield return new WaitForSeconds(enemies[i].moveTime);
+                //Wait for Enemy's moveTime before moving next Enemy, 
+                yield return new WaitForSeconds(enemies[i].moveTime);
 			}
 			//Once Enemies are done moving, set playersTurn to true so player can move.
 			playersTurn = true;
