@@ -17,6 +17,8 @@ namespace Completed
 		private float inverseMoveTime;			//Used to make movement more efficient.
 		private bool isMoving;                  //Is the object currently moving.
 
+        protected bool ableMove;
+
         [FMODUnity.EventRef]
         public string PlayerMove;
         private EventInstance playerMove;
@@ -132,7 +134,8 @@ namespace Completed
 
             //Set canMove to true if Move was successful, false if failed.
             bool canMove = Move(xDir, yDir, out hit);
-            
+
+            SetMove(canMove);
 
             //Check if nothing was hit by linecast
             if (hit.transform == null)
@@ -149,13 +152,24 @@ namespace Completed
 			if(!canMove && hitComponent != null)
 				
 				//Call the OnCantMove function and pass it hitComponent as a parameter.
-				OnCantMove (hitComponent, canMove);
+				OnCantMove (hitComponent);
 		}
 		
 		
 		//The abstract modifier indicates that the thing being modified has a missing or incomplete implementation.
 		//OnCantMove will be overriden by functions in the inheriting classes.
-		protected abstract void OnCantMove <T> (T component, bool cantMove = false)
+		protected abstract void OnCantMove <T> (T component)
 			where T : Component;
-	}
+
+        protected bool GetMove()
+        {
+            return ableMove;
+        }
+
+        protected void SetMove(bool move)
+        {
+             ableMove = move;
+        }
+
+    }
 }

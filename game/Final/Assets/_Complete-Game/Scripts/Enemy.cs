@@ -2,6 +2,8 @@
 using FMOD.Studio;
 using FMODUnity;
 using System.Collections;
+using System.Collections.Generic;		//Allows us to use Lists. 
+
 
 namespace Completed
 {
@@ -21,6 +23,15 @@ namespace Completed
 
         private bool canMove;
 
+        private List<Enemy> enemyList;
+
+        private int nextX;
+        private int nextY;
+        private Vector2 nextMove;
+
+
+
+
         [FMODUnity.EventRef]
         public string EnemyDamaged;
         private EventInstance enemyDamaged;
@@ -32,6 +43,13 @@ namespace Completed
         [FMODUnity.EventRef]
         public string EnemyMove;
         private EventInstance enemyMove;
+
+        [FMODUnity.EventRef]
+        public string Proximity;
+        private EventInstance proximity;
+        private float proxParam;
+        private bool proxCheck1;
+        private bool proxCheck2;
 
 
 
@@ -45,11 +63,21 @@ namespace Completed
             //This allows the GameManager to issue movement commands.
             GameManager.instance.AddEnemyToList (this);
 
+            nextX = 0;
+            nextY = 0;
+
             enemyDamaged = FMODUnity.RuntimeManager.CreateInstance("event:/Enemy/EnemyDamaged");
 
             enemyDeath = FMODUnity.RuntimeManager.CreateInstance("event:/Enemy/EnemyDeath");
 
             enemyMove = FMODUnity.RuntimeManager.CreateInstance("event:/Enemy/ZombieMove");
+
+            proximity = FMODUnity.RuntimeManager.CreateInstance("event:/Enemy/Proximity");
+
+            enemyList = GameManager.instance.enemies;
+
+            proxCheck1 = true;
+            proxCheck2 = true;
 
 
             //Get and store a reference to the attached Animator component.
@@ -63,27 +91,50 @@ namespace Completed
             //Call the start function of our base class MovingObject.
             base.Start ();
 		}
-		
-		
-		//Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.
-		//See comments in MovingObject for more on how base AttemptMove function works.
-		protected override void AttemptMove <T> (int xDir, int yDir)
+
+        private void Update()
+        {
+            if (nextX != 0 || nextY != 0)
+            {
+                //AttemptMove<Wall>(nextX, nextY);
+
+            }
+
+        }
+
+
+        //Override the AttemptMove function of MovingObject to include functionality needed for Enemy to skip turns.
+        //See comments in MovingObject for more on how base AttemptMove function works.
+        protected override void AttemptMove <T> (int xDir, int yDir)
 		{
-			//Check if skipMove is true, if so set it to false and skip this turn.
-			if(skipMove)
+
+            //Check if skipMove is true, if so set it to false and skip this turn.
+            if (skipMove)
 			{
 				skipMove = false;
                 return;
 				
 			}
 
-            canMove = false;
+            nextX = xDir;
+            nextY = yDir;
+
+            canMove = true;
+
+            //canMove = GetMove();
 
             //Call the AttemptMove function from MovingObject.
             base.AttemptMove <T> (xDir, yDir);
-			
-			//Now that Enemy has moved, set skipMove to true to skip next move.
-			skipMove = true;
+
+            if (!skipMove && canMove)
+            {
+                enemyMove.start();
+                CheckEnemies();
+
+            }
+
+            //Now that Enemy has moved, set skipMove to true to skip next move.
+            skipMove = true;
 
         }
 
@@ -97,11 +148,9 @@ namespace Completed
             int xDir = 0;
 			int yDir = 0;
 
-            if (!skipMove && canMove)
-            {
-                enemyMove.start();
 
-            }
+
+            
 
 
             //If the difference in positions is approximately zero (Epsilon) do the following:
@@ -114,10 +163,71 @@ namespace Completed
 			else
 				//Check if target x position is greater than enemy's x position, if so set x direction to 1 (move right), if not set to -1 (move left).
 				xDir = target.position.x > transform.position.x ? 1 : -1;
-			
-			//Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
-			AttemptMove <Player> (xDir, yDir);
-		}
+
+            nextMove.x = xDir + transform.position.x;
+            nextMove.y = yDir + transform.position.y;
+
+            if(canMove)
+            {
+            }
+
+            AttemptMove<Wall>(xDir, yDir);
+            AttemptMove<Player>(xDir, yDir);
+
+
+            //Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
+
+        }
+
+        private void CheckEnemies()
+        {
+            if (target != null && transform != null)
+            {
+                proximity.getParameterByName("Prox", out proxParam);
+                proxParam = 0;
+
+
+                if (((Mathf.Abs(target.position.x - nextMove.x) <= 1) &&
+                       (Mathf.Abs(target.position.y - nextMove.y) <= 1)))
+                {
+                    //proxCheck2 = false;
+                    proxParam = 2.0f;
+                    proximity.setParameterByName("Prox", proxParam);
+                    proximity.start();
+                }
+
+                else if (((Mathf.Abs(target.position.x - nextMove.x) <= 2) &&
+                        (Mathf.Abs(target.position.y - nextMove.y) <= 2)))
+                {
+                    //proxCheck1 = false;
+                    proxParam = 1.0f;
+                    proximity.setParameterByName("Prox", proxParam);
+                    proximity.start();
+                }
+
+                else if (((Mathf.Abs(target.position.x - nextMove.x) > 1) &&
+                    (Mathf.Abs(target.position.y - nextMove.y) > 1)))
+                {
+                    //proxCheck1 = true;
+                    proxParam = 0;
+
+                }
+
+                else if (((Mathf.Abs(target.position.x - nextMove.x) > 0) &&
+                   (Mathf.Abs(target.position.y - nextMove.y) > 0)))
+                {
+                    //proxCheck2 = true;
+                    proxParam = 1.0f;
+                }
+                    
+
+                //proximity.setParameterByName("Prox", proxParam);
+                //proximity.start();
+
+            }
+
+
+        }
 
         public void DamageEnemy(int damage)
         {
@@ -139,20 +249,36 @@ namespace Completed
 
         //OnCantMove is called if Enemy attempts to move into a space occupied by a Player, it overrides the OnCantMove function of MovingObject 
         //and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
-        protected override void OnCantMove <T> (T component, bool cantMove = false)
+        protected override void OnCantMove <T> (T component)
 		{
-            canMove = cantMove;
-            //Declare hitPlayer and set it to equal the encountered component.
-            Player hitPlayer = component as Player;
-			
-			//Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
-			hitPlayer.LoseFood (playerDamage);
-			
-			//Set the attack trigger of animator to trigger Enemy attack animation.
-			animator.SetTrigger ("enemyAttack");
-			
-			//Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
-			//SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
-		}
-	}
+            if (component is Wall)
+            {
+                //Set hitWall to equal the component passed in as a parameter.
+                Wall hitWall = component as Wall;
+
+            }
+
+            //else if (component is Enemy)
+            //{
+                //Declare hitPlayer and set it to equal the encountered component.
+                Player hitPlayer = component as Player;
+
+                //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
+                hitPlayer.LoseFood(playerDamage);
+
+                //Set the attack trigger of animator to trigger Enemy attack animation.
+                animator.SetTrigger("enemyAttack");
+            //}
+            Debug.Log("Hello");
+
+            //canMove = cantMove;
+            canMove = false;
+
+
+            //Call the RandomizeSfx function of SoundManager passing in the two audio clips to choose randomly between.
+            //SoundManager.instance.RandomizeSfx (attackSound1, attackSound2);
+        }
+
+
+    }
 }

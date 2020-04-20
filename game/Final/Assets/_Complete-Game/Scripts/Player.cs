@@ -4,6 +4,8 @@ using FMODUnity;
 using System.Collections;
 using UnityEngine.UI;	//Allows us to use UI.
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;		//Allows us to use Lists. 
+
 
 namespace Completed
 {
@@ -65,6 +67,9 @@ namespace Completed
         public string SodaDrink;
         private EventInstance sodaDrink;
 
+        
+
+
         //[FMODUnity.EventRef]
         //public string PlayerMove;
 
@@ -83,12 +88,16 @@ namespace Completed
 			
 			//Get the current food point total stored in GameManager.instance between levels.
 			food = GameManager.instance.playerFoodPoints;
-			
-			//Set the foodText to reflect the current player food total.
-			foodText.text = "Food: " + food;
+
+
+            //Set the foodText to reflect the current player food total.
+            foodText.text = "Food: " + food;
 
             check = true;
             foodCheck = true;
+
+            
+
 
             playerBreak = FMODUnity.RuntimeManager.CreateInstance(PlayerBreak);
             //playerMove = FMODUnity.RuntimeManager.CreateInstance(PlayerMove);
@@ -106,6 +115,7 @@ namespace Completed
             foodCrunch = FMODUnity.RuntimeManager.CreateInstance(FoodCrunch);
 
             sodaDrink = FMODUnity.RuntimeManager.CreateInstance(SodaDrink);
+
 
             //Call the Start function of the MovingObject base class.
             base.Start ();
@@ -157,7 +167,8 @@ namespace Completed
                 }
             }
 
-            
+
+
             healthLow.getParameterByName("Health", out healthParam);
             healthParam = (food / 100.0f);
             healthLow.setParameterByName("Health", healthParam);
@@ -248,11 +259,13 @@ namespace Completed
 			GameManager.instance.playersTurn = false;
             //playerMove.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
 		}
+
+       
 		
 		
 		//OnCantMove overrides the abstract function OnCantMove in MovingObject.
 		//It takes a generic parameter T which in the case of Player is a Wall which the player can attack and destroy.
-		protected override void OnCantMove <T> (T component, bool cantMove = false)
+		protected override void OnCantMove <T> (T component)
 		{
             if (component is Wall)
             {
@@ -438,6 +451,8 @@ namespace Completed
 				GameManager.instance.GameOver ();
 			}
 		}
-	}
+
+        
+    }
 }
 
