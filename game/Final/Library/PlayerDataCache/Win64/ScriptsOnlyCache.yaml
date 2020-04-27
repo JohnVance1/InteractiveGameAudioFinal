@@ -5,6 +5,8 @@ ScriptsOnlyBuild:
     - FMODUnity.EditorEventRef
     - FMODUnity.EditorParamRef
     - FMODUnity.EventCache
+    Assembly-CSharp-Editor.dll:
+    - ReadmeEditor
     Assembly-CSharp-firstpass.dll:
     - FMODUnity.Settings
     - FMODUnity.StudioListener
@@ -16,6 +18,7 @@ ScriptsOnlyBuild:
     - Completed.Player
     - Completed.SoundManager
     - Completed.Wall
+    - Readme
     - SceneLoader
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.UnitTesting.CallbackData
@@ -714,4 +717,4 @@ ScriptsOnlyBuild:
   scenePathNames:
   - Assets/_Complete-Game/Scenes/MainMenu.unity
   - Assets/_Complete-Game/_Complete-Game.unity
-  playerPath: D:/RIT School/IGA/Build_Milestone_5/New Unity Project.exe
+  playerPath: D:/RIT School/IGA/AnotherBuild/New Unity Project.exe

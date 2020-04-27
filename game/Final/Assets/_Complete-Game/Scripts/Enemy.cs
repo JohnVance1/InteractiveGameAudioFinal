@@ -22,6 +22,7 @@ namespace Completed
         private int health;
 
         private bool canMove;
+        private int numMoves;
 
         private List<Enemy> enemyList;
 
@@ -59,6 +60,8 @@ namespace Completed
             // Health of the enemy
             health = 2;
             canMove = false;
+            numMoves = 0;
+            skipMove = true;
             //Register this enemy with our instance of GameManager by adding it to a list of Enemy objects. 
             //This allows the GameManager to issue movement commands.
             GameManager.instance.AddEnemyToList (this);
@@ -109,13 +112,14 @@ namespace Completed
 		{
 
             //Check if skipMove is true, if so set it to false and skip this turn.
-            if (skipMove)
-			{
-				skipMove = false;
-                canMove = true;
-                return;
+            //if (skipMove)
+			//{
+				//skipMove = false;
+                //canMove = true;
+                //numMoves = 0;
+                //return;
 
-            }
+            //}
 
             nextX = xDir;
             nextY = yDir;
@@ -126,24 +130,32 @@ namespace Completed
             //Call the AttemptMove function from MovingObject.
             base.AttemptMove<T>(xDir, yDir);
 
-            if (!skipMove && canMove)
-            {             
+
+            if (canMove)
+            {
                 enemyMove.start();
                 CheckEnemies();
                 //skipMove = true;
 
             }
 
-            if (!skipMove)
+            numMoves++;
+
+            if (numMoves > 2)
             {
-                skipMove = true;
+                //skipMove = true;
+                canMove = true;
+                numMoves = 0;
+            }
+
+            else
+            {
 
             }
 
             //skipMove = true;
 
             //Now that Enemy has moved, set skipMove to true to skip next move.
-
         }
 
 
@@ -179,8 +191,8 @@ namespace Completed
             {
             }
 
+            AttemptMove<Wall>(xDir, yDir);
             AttemptMove<Player>(xDir, yDir);
-
             AttemptMove<Wall>(xDir, yDir);
 
 

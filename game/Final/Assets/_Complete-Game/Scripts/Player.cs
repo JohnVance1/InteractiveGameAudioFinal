@@ -81,6 +81,10 @@ namespace Completed
         public string PlayerMove;
         private EventInstance playerMove;
 
+        //[FMODUnity.EventRef]
+        //public string AmbiantMusic;
+        //private EventInstance ambiantMusic;
+
 
 
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
@@ -130,6 +134,11 @@ namespace Completed
 
             enterExit = FMODUnity.RuntimeManager.CreateInstance(EnterExit);
 
+            //ambiantMusic = FMODUnity.RuntimeManager.CreateInstance("event:/Music/Ambient");
+
+
+            //ambiantMusic.start();
+
             //Call the Start function of the MovingObject base class.
             base.Start ();
 		}
@@ -138,8 +147,10 @@ namespace Completed
 		//This function is called when the behaviour becomes disabled or inactive.
 		private void OnDisable ()
 		{
-			//When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
-			GameManager.instance.playerFoodPoints = food;
+            //ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+            //When Player object is disabled, store the current local food total in the GameManager so it can be re-loaded in next level.
+            GameManager.instance.playerFoodPoints = food;
             //healthLow.setPaused(false);
 
         }
@@ -238,6 +249,7 @@ namespace Completed
                 //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
                 AttemptMove<Wall> (horizontal, vertical);
                 AttemptMove<Enemy>(horizontal, vertical);
+
                 //AttemptMove<BoardManager> (horizontal, vertical);
             }
         }
@@ -346,11 +358,14 @@ namespace Completed
                 {
                     //healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
                     healthLow.setPaused(true);
+                    GameManager.instance.ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
                     enterExit.start();
                     //foodCheck = true;
                     //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
                     Invoke("Restart", restartLevelDelay);
-                   
+
+
                     check = false;
 
                 }
@@ -491,6 +506,7 @@ namespace Completed
                 //Stop the background music.
                 //SoundManager.instance.musicSource.Stop();
                 healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                //ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
 
                 gameOver.start();
 				

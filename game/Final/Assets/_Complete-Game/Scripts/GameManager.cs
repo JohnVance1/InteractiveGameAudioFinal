@@ -32,7 +32,7 @@ namespace Completed
 
         [FMODUnity.EventRef]
         public string AmbiantMusic;
-        private EventInstance ambiantMusic;
+        public EventInstance ambiantMusic;
 
 
         //Awake is always called before any Start functions
@@ -98,6 +98,8 @@ namespace Completed
 
 
             ambiantMusic = FMODUnity.RuntimeManager.CreateInstance("event:/Music/Ambient");
+
+
             //While doingSetup is true the player can't move, prevent player from moving while title card is up.
             doingSetup = true;
 			
@@ -118,6 +120,8 @@ namespace Completed
                 levelSwitch.start();
 
             }
+            ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
 
             //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
             Invoke("HideLevelImage", levelStartDelay);
@@ -142,11 +146,26 @@ namespace Completed
 			
 			//Set doingSetup to false allowing player to move again.
 			doingSetup = false;
+
+            ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
             ambiantMusic.start();
+
+
+            //if (isPlaying(ambiantMusic) == true)
+            //{
+            //    ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+            //}
+            //if(isPlaying(ambiantMusic) == false)
+            //{
+            //    ambiantMusic.start();
+
+            //}
+
         }
-		
-		//Update is called every frame.
-		void Update()
+
+        //Update is called every frame.
+        void Update()
 		{
 			//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
 			if(playersTurn || enemiesMoving || doingSetup)
@@ -181,7 +200,14 @@ namespace Completed
         //GameOver is called when the player reaches 0 food points
         public void GameOver()
 		{
+            //if(isPlaying(ambiantMusic) == true)
+            //{
+            //    ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+            //}
+
             ambiantMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
             //Set levelText to display number of levels passed and game over message
             levelText.text = "After " + level + " days, you starved.";
 			
