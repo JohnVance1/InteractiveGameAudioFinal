@@ -26,6 +26,8 @@ namespace Completed
 		public AudioClip gameOverSound;				//Audio clip to play when player dies.
         private bool check;
         private bool foodCheck;
+        private bool moveCheck;
+        private int doubleCheck;
 
         private Animator animator;					//Used to store a reference to the Player's animator component.
 		private int food;                           //Used to store player food points total during level.
@@ -67,13 +69,19 @@ namespace Completed
         public string SodaDrink;
         private EventInstance sodaDrink;
 
-        
+        [FMODUnity.EventRef]
+        public string GameOver;
+        private EventInstance gameOver;
+
+        [FMODUnity.EventRef]
+        public string EnterExit;
+        private EventInstance enterExit;
+
+        [FMODUnity.EventRef]
+        public string PlayerMove;
+        private EventInstance playerMove;
 
 
-        //[FMODUnity.EventRef]
-        //public string PlayerMove;
-
-        //private EventInstance playerMove;
 
 #if UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
@@ -96,11 +104,13 @@ namespace Completed
             check = true;
             foodCheck = true;
 
-            
+            moveCheck = true;
+            doubleCheck = 0;
 
 
             playerBreak = FMODUnity.RuntimeManager.CreateInstance(PlayerBreak);
-            //playerMove = FMODUnity.RuntimeManager.CreateInstance(PlayerMove);
+
+            playerMove = FMODUnity.RuntimeManager.CreateInstance(PlayerMove);
 
             playerDamaged = FMODUnity.RuntimeManager.CreateInstance("event:/Player/PlayerDamaged");
             pickUp = FMODUnity.RuntimeManager.CreateInstance(PickUp);
@@ -116,6 +126,9 @@ namespace Completed
 
             sodaDrink = FMODUnity.RuntimeManager.CreateInstance(SodaDrink);
 
+            gameOver = FMODUnity.RuntimeManager.CreateInstance(GameOver);
+
+            enterExit = FMODUnity.RuntimeManager.CreateInstance(EnterExit);
 
             //Call the Start function of the MovingObject base class.
             base.Start ();
@@ -155,17 +168,19 @@ namespace Completed
 				vertical = 0;
 			}
 
-            if (rb2D != null)
-            {
-                if ((rb2D.position + new Vector2(horizontal, vertical)).x == -1 ||
-                    (rb2D.position + new Vector2(horizontal, vertical)).x == 8 ||
-                    (rb2D.position + new Vector2(horizontal, vertical)).y == -1 ||
-                    (rb2D.position + new Vector2(horizontal, vertical)).y == 8)
-                {
-                    hitWall.start();
+            //if (rb2D != null && moveCheck)
+            //{
+            //    if ((rb2D.position + new Vector2(horizontal, vertical)).x == -1 ||
+            //        (rb2D.position + new Vector2(horizontal, vertical)).x == 8 ||
+            //        (rb2D.position + new Vector2(horizontal, vertical)).y == -1 ||
+            //        (rb2D.position + new Vector2(horizontal, vertical)).y == 8)
+            //    {
+            //        playerMove.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
 
-                }
-            }
+            //        hitWall.start();
+
+            //    }
+            //}
 
 
 
@@ -218,9 +233,10 @@ namespace Completed
             //Check if we have a non-zero value for horizontal or vertical
             if (horizontal != 0 || vertical != 0)
 			{
-				//Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
-				//Pass in horizontal and vertical as parameters to specify the direction to move Player in.
-				AttemptMove<Wall> (horizontal, vertical);
+                doubleCheck = 0;
+                //Call AttemptMove passing in the generic parameter Wall, since that is what Player may interact with if they encounter one (by attacking it)
+                //Pass in horizontal and vertical as parameters to specify the direction to move Player in.
+                AttemptMove<Wall> (horizontal, vertical);
                 AttemptMove<Enemy>(horizontal, vertical);
                 //AttemptMove<BoardManager> (horizontal, vertical);
             }
@@ -234,6 +250,7 @@ namespace Completed
             //food--;
 
             LoseFood();
+            moveCheck = true;
 
             //Update food text display to reflect current score.
 
@@ -251,7 +268,34 @@ namespace Completed
             //             //playerMove.start();
             //         }
 
-            
+            if (rb2D != null && moveCheck)
+            {
+                if ((rb2D.position + new Vector2(xDir, yDir)).x == -1 ||
+                    (rb2D.position + new Vector2(xDir, yDir)).x == 8 ||
+                    (rb2D.position + new Vector2(xDir, yDir)).y == -1 ||
+                    (rb2D.position + new Vector2(xDir, yDir)).y == 8)
+                {
+                    playerMove.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+                    hitWall.start();
+
+                }
+            }
+
+
+
+            if (moveCheck && doubleCheck < 1)
+            {
+                playerMove.start();
+                doubleCheck++;
+
+            }
+            else if(!moveCheck && doubleCheck < 1)
+            {
+                doubleCheck++;
+
+            }
+
             //Since the player has moved and lost food points, check if the game has ended.
             CheckIfGameOver();
 			
@@ -285,7 +329,7 @@ namespace Completed
                 playerHitEnemy.start();
             }
 
-
+            moveCheck = false;
             //Set the attack trigger of the player's animation controller in order to play the player's attack animation.
             animator.SetTrigger ("playerChop");
 
@@ -302,6 +346,7 @@ namespace Completed
                 {
                     //healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
                     healthLow.setPaused(true);
+                    enterExit.start();
                     //foodCheck = true;
                     //Invoke the Restart function to start the next level with a delay of restartLevelDelay (default 1 second).
                     Invoke("Restart", restartLevelDelay);
@@ -445,7 +490,9 @@ namespace Completed
                 playerDeath.start();
                 //Stop the background music.
                 //SoundManager.instance.musicSource.Stop();
-                healthLow.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                healthLow.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+                gameOver.start();
 				
 				//Call the GameOver function of GameManager.
 				GameManager.instance.GameOver ();

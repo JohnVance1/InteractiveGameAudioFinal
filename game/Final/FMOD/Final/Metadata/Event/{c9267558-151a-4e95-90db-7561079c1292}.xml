@@ -93,7 +93,7 @@
 			<value>true</value>
 		</property>
 		<property name="length">
-			<value>18</value>
+			<value>12</value>
 		</property>
 		<property name="playlistMode">
 			<value>1</value>
@@ -133,21 +133,33 @@
 	<object class="MixerBusPanner" id="{be110dbf-1e06-4176-bc48-7e63416660a0}" />
 	<object class="MixerBusFader" id="{946b905e-b94e-42b3-bfbc-17be88c80328}" />
 	<object class="SingleSound" id="{1cc07ede-9ab1-4815-ac79-8b1bd0c6101e}">
+		<relationship name="modulators">
+			<destination>{af912cca-38cf-47e2-b60f-4cf23034eaff}</destination>
+		</relationship>
 		<relationship name="audioFile">
 			<destination>{fb9994d4-69f5-4089-92c8-8fab3ecbf6ea}</destination>
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{c081090a-dbc3-4bb6-a0ad-5c408b84b817}">
+		<relationship name="modulators">
+			<destination>{9e80228d-9b3d-4fa1-be40-0b1bc887ad33}</destination>
+		</relationship>
 		<relationship name="audioFile">
 			<destination>{d1f7d294-aa4c-4c39-9b34-b1120be13e79}</destination>
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{3d437c4d-210d-4bd0-9a8a-a4ee1aed791f}">
+		<relationship name="modulators">
+			<destination>{e88f6add-7bcf-46ce-83d8-ac9b1ded2cb7}</destination>
+		</relationship>
 		<relationship name="audioFile">
 			<destination>{5891e79a-0f1c-4dba-86cb-c8cca6330726}</destination>
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{c17a7112-8df4-4abd-a82c-3c54d2671c88}">
+		<relationship name="modulators">
+			<destination>{1892cd78-243c-4856-bba6-536b219f3f23}</destination>
+		</relationship>
 		<relationship name="audioFile">
 			<destination>{cdb574ec-eead-464d-b856-3eb4f7df1f99}</destination>
 		</relationship>
@@ -167,5 +179,97 @@
 	</object>
 	<object class="MixerBusPanner" id="{87cb40ce-3930-45cd-a84a-2ac02aefbb59}" />
 	<object class="MixerBusFader" id="{88c16400-1d3e-444f-8050-f4379e4bf947}" />
+	<object class="ADSRModulator" id="{af912cca-38cf-47e2-b60f-4cf23034eaff}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="initialValue">
+			<value>-80</value>
+		</property>
+		<property name="attackTime">
+			<value>320</value>
+		</property>
+		<property name="holdTime">
+			<value>1400</value>
+		</property>
+		<property name="sustainValue">
+			<value>-80</value>
+		</property>
+		<property name="releaseTime">
+			<value>0</value>
+		</property>
+		<property name="finalValue">
+			<value>-80</value>
+		</property>
+	</object>
+	<object class="ADSRModulator" id="{9e80228d-9b3d-4fa1-be40-0b1bc887ad33}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="initialValue">
+			<value>-80</value>
+		</property>
+		<property name="attackTime">
+			<value>320</value>
+		</property>
+		<property name="holdTime">
+			<value>1400</value>
+		</property>
+		<property name="sustainValue">
+			<value>-80</value>
+		</property>
+		<property name="releaseTime">
+			<value>0</value>
+		</property>
+		<property name="finalValue">
+			<value>-80</value>
+		</property>
+	</object>
+	<object class="ADSRModulator" id="{e88f6add-7bcf-46ce-83d8-ac9b1ded2cb7}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="initialValue">
+			<value>-80</value>
+		</property>
+		<property name="attackTime">
+			<value>320</value>
+		</property>
+		<property name="holdTime">
+			<value>1400</value>
+		</property>
+		<property name="sustainValue">
+			<value>-80</value>
+		</property>
+		<property name="releaseTime">
+			<value>0</value>
+		</property>
+		<property name="finalValue">
+			<value>-80</value>
+		</property>
+	</object>
+	<object class="ADSRModulator" id="{1892cd78-243c-4856-bba6-536b219f3f23}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="initialValue">
+			<value>-80</value>
+		</property>
+		<property name="attackTime">
+			<value>320</value>
+		</property>
+		<property name="holdTime">
+			<value>1400</value>
+		</property>
+		<property name="sustainValue">
+			<value>-80</value>
+		</property>
+		<property name="releaseTime">
+			<value>0</value>
+		</property>
+		<property name="finalValue">
+			<value>-80</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{79d3e158-8237-47b5-8289-700cf7c523ed}" />
 </objects>

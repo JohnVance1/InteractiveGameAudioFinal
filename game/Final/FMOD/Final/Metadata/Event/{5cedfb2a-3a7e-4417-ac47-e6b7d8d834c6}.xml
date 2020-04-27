@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.00.00">
 	<object class="Event" id="{5cedfb2a-3a7e-4417-ac47-e6b7d8d834c6}">
 		<property name="name">
-			<value>Ambiant</value>
+			<value>Ambient</value>
 		</property>
 		<property name="outputFormat">
 			<value>1</value>
@@ -98,6 +98,9 @@
 		<property name="volume">
 			<value>-12</value>
 		</property>
+		<relationship name="modulators">
+			<destination>{4024f19a-9959-48c5-83e6-cfe3f73fffcc}</destination>
+		</relationship>
 		<relationship name="effectChain">
 			<destination>{a66b92cb-192d-4fcd-b5a1-fa42b44181dd}</destination>
 		</relationship>
@@ -252,6 +255,23 @@
 		<relationship name="markerTrack">
 			<destination>{44060fc3-bf57-47b7-8b8c-3ae630dd4136}</destination>
 		</relationship>
+	</object>
+	<object class="ADSRModulator" id="{4024f19a-9959-48c5-83e6-cfe3f73fffcc}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>volume</value>
+		</property>
+		<property name="initialValue">
+			<value>-80</value>
+		</property>
+		<property name="attackTime">
+			<value>620</value>
+		</property>
+		<property name="releaseTime">
+			<value>794.871826</value>
+		</property>
+		<property name="finalValue">
+			<value>-80</value>
+		</property>
 	</object>
 	<object class="MixerBusEffectChain" id="{a66b92cb-192d-4fcd-b5a1-fa42b44181dd}">
 		<relationship name="effects">

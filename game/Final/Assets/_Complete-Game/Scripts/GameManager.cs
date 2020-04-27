@@ -61,7 +61,7 @@ namespace Completed
             boardScript = GetComponent<BoardManager>();
 			
 			//Call the InitGame function to initialize the first level 
-			InitGame();
+			//InitGame();
 		}
 
         //this is called only once, and the paramter tell it to be called only after the scene was loaded
@@ -81,12 +81,23 @@ namespace Completed
 
         }
 
+        bool isPlaying(EventInstance track)
+        {
+            PLAYBACK_STATE state;
+            track.getPlaybackState(out state);
+            return state != PLAYBACK_STATE.STOPPED;
+
+        }
+
 
         //Initializes the game for each level.
         void InitGame()
 		{
             levelSwitch = FMODUnity.RuntimeManager.CreateInstance("event:/Misc/LevelSwitch");
-            ambiantMusic = FMODUnity.RuntimeManager.CreateInstance("event:/Music/Ambiant");
+            //levelSwitch.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+
+            ambiantMusic = FMODUnity.RuntimeManager.CreateInstance("event:/Music/Ambient");
             //While doingSetup is true the player can't move, prevent player from moving while title card is up.
             doingSetup = true;
 			
@@ -96,21 +107,27 @@ namespace Completed
 			//Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
 			levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
-            levelSwitch.start();
             //Set the text of levelText to the string "Day" and append the current level number.
             levelText.text = "Day " + level;
 			
 			//Set levelImage to active blocking player's view of the game board during setup.
 			levelImage.SetActive(true);
-			
-			//Call the HideLevelImage function with a delay in seconds of levelStartDelay.
-			Invoke("HideLevelImage", levelStartDelay);
+
+            if (isPlaying(levelSwitch) == false)
+            {
+                levelSwitch.start();
+
+            }
+
+            //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
+            Invoke("HideLevelImage", levelStartDelay);
 			
 			//Clear any Enemy objects in our List to prepare for next level.
 			enemies.Clear();
-			
-			//Call the SetupScene function of the BoardManager script, pass it current level number.
-			boardScript.SetupScene(level);
+
+
+            //Call the SetupScene function of the BoardManager script, pass it current level number.
+            boardScript.SetupScene(level);
             //levelSwitch.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
 
 
@@ -125,7 +142,6 @@ namespace Completed
 			
 			//Set doingSetup to false allowing player to move again.
 			doingSetup = false;
-            levelSwitch.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
             ambiantMusic.start();
         }
 		

@@ -112,29 +112,37 @@ namespace Completed
             if (skipMove)
 			{
 				skipMove = false;
+                canMove = true;
                 return;
-				
-			}
+
+            }
 
             nextX = xDir;
             nextY = yDir;
 
-            canMove = true;
 
             //canMove = GetMove();
 
             //Call the AttemptMove function from MovingObject.
-            base.AttemptMove <T> (xDir, yDir);
+            base.AttemptMove<T>(xDir, yDir);
 
             if (!skipMove && canMove)
-            {
+            {             
                 enemyMove.start();
                 CheckEnemies();
+                //skipMove = true;
 
             }
 
+            if (!skipMove)
+            {
+                skipMove = true;
+
+            }
+
+            //skipMove = true;
+
             //Now that Enemy has moved, set skipMove to true to skip next move.
-            skipMove = true;
 
         }
 
@@ -171,8 +179,9 @@ namespace Completed
             {
             }
 
-            AttemptMove<Wall>(xDir, yDir);
             AttemptMove<Player>(xDir, yDir);
+
+            AttemptMove<Wall>(xDir, yDir);
 
 
             //Call the AttemptMove function and pass in the generic parameter Player, because Enemy is moving and expecting to potentially encounter a Player
@@ -251,23 +260,29 @@ namespace Completed
         //and takes a generic parameter T which we use to pass in the component we expect to encounter, in this case Player
         protected override void OnCantMove <T> (T component)
 		{
-            if (component is Wall)
-            {
-                //Set hitWall to equal the component passed in as a parameter.
-                Wall hitWall = component as Wall;
-
-            }
-
-            //else if (component is Enemy)
+            //if (component is Wall)
             //{
-                //Declare hitPlayer and set it to equal the encountered component.
-                Player hitPlayer = component as Player;
+            //    //Set hitWall to equal the component passed in as a parameter.
+            //    Wall hitWall = component as Wall;
 
+            //}
+
+            //else if (component is Player)
+            //{
+            //Declare hitPlayer and set it to equal the encountered component.
+            Player hitPlayer = component as Player;
+
+            if(hitPlayer != null)
+            {
                 //Call the LoseFood function of hitPlayer passing it playerDamage, the amount of foodpoints to be subtracted.
                 hitPlayer.LoseFood(playerDamage);
 
                 //Set the attack trigger of animator to trigger Enemy attack animation.
                 animator.SetTrigger("enemyAttack");
+
+            }
+            
+
             //}
             Debug.Log("Hello");
 

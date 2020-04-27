@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.00.00">
 	<object class="Event" id="{44026d03-f472-4ce9-a600-7ad1998adf92}">
 		<property name="name">
-			<value>Hit Wall</value>
+			<value>HitWall</value>
 		</property>
 		<property name="outputFormat">
 			<value>1</value>
@@ -60,7 +60,7 @@
 	<object class="MarkerTrack" id="{f885b1b3-701d-4a31-b391-2ef73826c474}" />
 	<object class="GroupTrack" id="{9b0f1f09-48b2-473b-94fe-f31e285559b8}">
 		<relationship name="modules">
-			<destination>{c02b3658-6f0c-4eb4-9258-8e919a19dd5c}</destination>
+			<destination>{3ddcdc1d-f127-47c6-a0ba-0b8d73e321fa}</destination>
 		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{3a8e8bd4-6aea-4f01-a65b-77a7bf355add}</destination>
@@ -68,7 +68,7 @@
 	</object>
 	<object class="Timeline" id="{8e21a018-4665-42b9-ae72-d5716359eb1c}">
 		<relationship name="modules">
-			<destination>{c02b3658-6f0c-4eb4-9258-8e919a19dd5c}</destination>
+			<destination>{3ddcdc1d-f127-47c6-a0ba-0b8d73e321fa}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{5785b2cb-bcb2-44d4-b8c5-a74ffb4e79ca}">
@@ -88,20 +88,17 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{4d50a198-e730-419e-a7d2-e7d36ae1a6af}" />
-	<object class="SingleSound" id="{c02b3658-6f0c-4eb4-9258-8e919a19dd5c}">
+	<object class="SingleSound" id="{3ddcdc1d-f127-47c6-a0ba-0b8d73e321fa}">
 		<property name="length">
-			<value>0.13</value>
+			<value>0.14000000000000001</value>
 		</property>
-		<relationship name="modulators">
-			<destination>{ffca0ea8-390f-4ed8-9776-ef9807eee976}</destination>
-		</relationship>
 		<relationship name="audioFile">
 			<destination>{4d986008-a9f8-402f-b0da-d89799342deb}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{3a8e8bd4-6aea-4f01-a65b-77a7bf355add}">
 		<property name="volume">
-			<value>-18.5</value>
+			<value>-7.5</value>
 		</property>
 		<property name="name">
 			<value>Audio 1</value>
@@ -123,14 +120,6 @@
 	</object>
 	<object class="MixerBusPanner" id="{52cf7661-05fb-41e2-bb07-9cf2370d97df}" />
 	<object class="MixerBusFader" id="{dd0a68f7-9962-4d67-a135-7f62652f4ee9}" />
-	<object class="RandomizerModulator" id="{ffca0ea8-390f-4ed8-9776-ef9807eee976}">
-		<property name="nameOfPropertyBeingModulated">
-			<value>pitch</value>
-		</property>
-		<property name="amount">
-			<value>16</value>
-		</property>
-	</object>
 	<object class="MixerBusEffectChain" id="{2f874144-53a1-4ee5-a6b2-081be00f6160}">
 		<relationship name="effects">
 			<destination>{910221bd-981e-445e-96e5-2eb34a457cc6}</destination>

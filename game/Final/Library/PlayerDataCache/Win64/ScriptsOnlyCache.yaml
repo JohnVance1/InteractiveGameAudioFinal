@@ -6,7 +6,6 @@ ScriptsOnlyBuild:
     - FMODUnity.EditorParamRef
     - FMODUnity.EventCache
     Assembly-CSharp-firstpass.dll:
-    - FMODUnity.RuntimeManager
     - FMODUnity.Settings
     - FMODUnity.StudioListener
     Assembly-CSharp.dll:
@@ -173,7 +172,7 @@ ScriptsOnlyBuild:
     className: CanvasScaler
   - hash:
       serializedVersion: 2
-      Hash: 006d4eecbcfa1b602c8e300c40e5280e
+      Hash: e7dd64998b6bf342baffaf88ddf5a515
     assemblyName: Assembly-CSharp.dll
     namespaceName: Completed
     className: Player
@@ -395,7 +394,7 @@ ScriptsOnlyBuild:
     className: FMODEventTrack
   - hash:
       serializedVersion: 2
-      Hash: 4d46e584f2c31862bda0af57f01f4f81
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
     assemblyName: Assembly-CSharp.dll
     namespaceName: Completed
     className: SoundManager
@@ -701,7 +700,7 @@ ScriptsOnlyBuild:
     className: ToggleGroup
   - hash:
       serializedVersion: 2
-      Hash: 3bdeb9e0cb20264eebe5eb095c5822ac
+      Hash: 834a93e1857e66e1e28aa0ee7b5f09c8
     assemblyName: Assembly-CSharp.dll
     namespaceName: Completed
     className: Enemy
@@ -715,4 +714,4 @@ ScriptsOnlyBuild:
   scenePathNames:
   - Assets/_Complete-Game/Scenes/MainMenu.unity
   - Assets/_Complete-Game/_Complete-Game.unity
-  playerPath: D:/RIT School/IGA/Build/New Unity Project.exe
+  playerPath: D:/RIT School/IGA/Build_Milestone_5/New Unity Project.exe

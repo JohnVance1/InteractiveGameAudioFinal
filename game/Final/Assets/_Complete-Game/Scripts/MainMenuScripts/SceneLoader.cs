@@ -15,6 +15,11 @@ public class SceneLoader : MonoBehaviour
     public string MainMusic;
     private EventInstance mainMusic;
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(this);
+    }
+
     void Start()
     {
         menuClick = FMODUnity.RuntimeManager.CreateInstance(MenuClick);
@@ -24,8 +29,8 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadScene(int level)
     {
-        mainMusic.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
         menuClick.start();
+        mainMusic.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         SceneManager.LoadScene(level, LoadSceneMode.Single);
 
     }

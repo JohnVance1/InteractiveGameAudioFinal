@@ -19,9 +19,9 @@ namespace Completed
 
         protected bool ableMove;
 
-        [FMODUnity.EventRef]
-        public string PlayerMove;
-        private EventInstance playerMove;
+        //[FMODUnity.EventRef]
+        //public string PlayerMove;
+        //private EventInstance playerMove;
 
         
 
@@ -35,7 +35,7 @@ namespace Completed
 			//Get a component reference to this object's Rigidbody2D
 			rb2D = GetComponent <Rigidbody2D> ();
 
-            playerMove = FMODUnity.RuntimeManager.CreateInstance("event:/Player/PlayerMove");
+            //playerMove = FMODUnity.RuntimeManager.CreateInstance("event:/Player/PlayerMove");
 
             isMoving = false;
 
@@ -74,7 +74,7 @@ namespace Completed
 				//Start SmoothMovement co-routine passing in the Vector2 end as destination
 				StartCoroutine (SmoothMovement (end));
 
-                playerMove.start();
+                //playerMove.start();
 
                 //Return true to say that Move was successful
                 return true;
