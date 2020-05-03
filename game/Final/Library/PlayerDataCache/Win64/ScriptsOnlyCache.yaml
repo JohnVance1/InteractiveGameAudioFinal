@@ -717,4 +717,4 @@ ScriptsOnlyBuild:
   scenePathNames:
   - Assets/_Complete-Game/Scenes/MainMenu.unity
   - Assets/_Complete-Game/_Complete-Game.unity
-  playerPath: D:/RIT School/IGA/AnotherBuild/New Unity Project.exe
+  playerPath: D:/RIT School/IGA/Final_Build/New Unity Project.exe

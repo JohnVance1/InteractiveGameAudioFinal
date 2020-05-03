@@ -164,6 +164,7 @@
 		<property name="length">
 			<value>33.5</value>
 		</property>
+		<property name="name" />
 		<property name="looping">
 			<value>true</value>
 		</property>
